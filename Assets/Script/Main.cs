@@ -1,12 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
     [SerializeField]
-    GameObject hour, min, sec;
+    GameObject objHour, objMin, objSec;
 
+    [SerializeField]
+    TextMeshPro txtTime;
+
+    [SerializeField]
+    Button btnA;
+
+    bool isStart;
     int idxHour, idxMin, idxSec;
     
     /*
@@ -18,6 +27,7 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isStart = true;
         StartCoroutine(MoveClock());
     }
 
@@ -26,7 +36,8 @@ public class Main : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            Application.Quit();
+            //isStart = false;
+            //Application.Quit();
         }
     }
 
@@ -45,16 +56,31 @@ public class Main : MonoBehaviour
 
     IEnumerator MoveClock()
     {
-        yield return new WaitForSecondsRealtime(1f);
-
-        secIndex++;
-
-        if(secIndex == 60)
+        while (isStart)
         {
-            minIndex++;
-            secIndex = 0;
+            yield return new WaitForSecondsRealtime(1f);
+
+            objSec.transform.Rotate(Vector3.back, 1f, Space.Self);
+
+            idxSec++;
+
+            if (idxSec == 60)
+            {
+                idxMin++;
+                idxSec = 0;
+            }
+            else if (idxMin == 60)
+            {
+                idxHour++;
+                idxSec = 0;
+                idxMin = 0;
+            }
+            else if (idxHour == 13)
+            {
+                idxHour = 0;
+                idxMin = 0;
+                idxSec = 0;
+            }
         }
-
-
     }
 }
