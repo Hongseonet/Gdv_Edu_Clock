@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Main : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class Main : MonoBehaviour
     TextMeshPro txtTime;
 
     [SerializeField]
-    Button btnA;
+    Transform btnRoot;
 
     bool isStart;
     int idxHour, idxMin, idxSec;
@@ -31,6 +32,13 @@ public class Main : MonoBehaviour
         isStart = true;
         secJump = 90; //1 or Dev
         jumpGap = 15; //1 or Dev
+
+        //btn listener
+        foreach(Button btn in btnRoot){
+            //Button btnE = new Button();
+            //btnE.oncl onclick.addLIstener(()=> BtnEvent(btne));
+        }
+
         StartCoroutine(MoveClock());
     }
 
@@ -42,6 +50,10 @@ public class Main : MonoBehaviour
             //isStart = false;
             //Application.Quit();
         }
+    }
+
+    void BtnEvent(Button btn){
+
     }
 
     void MoveNIddle(bool isAuto, GameObject target)
