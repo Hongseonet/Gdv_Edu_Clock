@@ -33,13 +33,20 @@ public class Main : MonoBehaviour
         secJump = 90; //1 or Dev
         jumpGap = 15; //1 or Dev
 
-        //btn listener
-        foreach(Button btn in btnRoot){
-            //Button btnE = new Button();
-            //btnE.oncl onclick.addLIstener(()=> BtnEvent(btne));
+        //btn search 2 depth, add listener
+        foreach(Transform depth1 in btnRoot){
+            foreach(Transform depth2 in depth1)
+            {
+                if(depth2.GetComponent<Button> () != null)
+                {
+                    //Debug.Log("dd : " + depth1.name + " / " + depth2.name);
+                    Button btn = depth2.GetComponent<Button>();
+                    btn.onClick.AddListener(() => BtnEvent(btn));
+                }
+            }
         }
 
-        StartCoroutine(MoveClock());
+        //StartCoroutine(MoveClock());
     }
 
     // Update is called once per frame
@@ -54,33 +61,55 @@ public class Main : MonoBehaviour
 
     void BtnEvent(Button btn){
 
+        switch (btn.transform.parent.name.Split('_')[1].ToLower())
+        {
+            case "hour":
+                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+                {
+                    SetTimer('h', true);
+                }
+                else
+                {
+                    SetTimer('h', false);
+                }
+                break;
+            case "min":
+                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+                {
+                    SetTimer('m', true);
+                }
+                else
+                {
+                    SetTimer('m', false);
+                }
+                break;
+            case "sec":
+                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+                {
+                    SetTimer('s', true);
+                }
+                else
+                {
+                    SetTimer('s', false);
+                }
+                break;
+        }
     }
 
-    void MoveNIddle(bool isAuto, GameObject target)
+    void SetTimer(char n, bool isForward)
     {
-        
-        if (isAuto)
-        {
-
-        }
-        else
-        {
-
-        }
-    }
-
-    void RotateNiddle(char n)
-    {
+        Vector3 direct = isForward ? Vector3.back : Vector3.forward;
+            
         switch (n)
         {
             case 'h': //hour
-
+                objHour.transform.Rotate(direct, 30f, Space.Self);
                 break;
             case 'm': //minute
-                objMin.transform.Rotate(Vector3.back, 6f, Space.Self);
+                objMin.transform.Rotate(direct, 6f, Space.Self);
                 break;
             case 's': //second
-                //not stop ever
+                objSec.transform.Rotate(direct, 6f, Space.Self);
                 break;
         }
     }
@@ -97,14 +126,14 @@ public class Main : MonoBehaviour
             {
                 idxMin++;
                 idxSec = 0;
-                RotateNiddle('m');
+                SetTimer('m', true);
             }
             else if (idxMin >= 60)
             {
                 idxHour++;
                 idxSec = 0;
                 idxMin = 0;
-                RotateNiddle('h');
+                SetTimer('h', true);
             }
             else if (idxHour == 13)
             {
