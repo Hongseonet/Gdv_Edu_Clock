@@ -16,10 +16,7 @@ public class Main : MonoBehaviour
     [SerializeField]
     Transform btnCtrTime;
 
-    bool isStart;
     Vector3 curTime; //hour min sec
-    int jumpGap, secJump;
-
     bool isQuit;
     
     /*
@@ -31,10 +28,6 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        isStart = true;
-        secJump = 90; //1 or Dev
-        jumpGap = 15; //1 or Dev
-
         curTime = new Vector3(); //init time
 
         //btn search 2 depth, add listener
@@ -60,8 +53,6 @@ public class Main : MonoBehaviour
                 }
             }
         }
-
-        //StartCoroutine(MoveClock());
     }
 
     // Update is called once per frame
@@ -69,7 +60,19 @@ public class Main : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            QuitApp();
+            StartCoroutine(QuitApp());
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            SetTimer('s', true);
+        }
+        else if (Input.GetKeyDown(KeyCode.M))
+        {
+            SetTimer('m', true);
+        }
+        else if (Input.GetKeyDown(KeyCode.H))
+        {
+            SetTimer('h', true);
         }
     }
 
@@ -77,7 +80,6 @@ public class Main : MonoBehaviour
     {
         if (isQuit)
         {
-            isStart = false;
             StopAllCoroutines();
             Application.Quit();
         }
@@ -126,11 +128,18 @@ public class Main : MonoBehaviour
         switch (btn.name.Split('_')[1].ToLower())
         {
             case "random":
-                SetRandom();
+                System.Random rand = new System.Random();
+                curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
                 txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
+                
+                InitNiddle('a'); //reset all
+
+                objHour.transform.Rotate(Vector3.back, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
+                objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
+                objSec.transform.Rotate(Vector3.back, 6f * curTime.z, Space.Self);
                 break;
             case "close":
-
+                StartCoroutine(QuitApp());
                 break;
         }
     }
@@ -142,8 +151,9 @@ public class Main : MonoBehaviour
         switch (n)
         {
             case 'h': //hour
+                InitNiddle('h'); //temporary reset
                 curTime.x++;
-                objHour.transform.Rotate(direct, 30f, Space.Self);
+                objHour.transform.Rotate(direct, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
                 break;
             case 'm': //minute
                 curTime.y++;
@@ -166,51 +176,39 @@ public class Main : MonoBehaviour
             curTime.x++;
             curTime.y = 0;
         }
+        else if(curTime.x > 12)
+        {
+            curTime.x = 1;
+        }
 
         txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
     }
 
-    void SetRandom()
-    {
-        System.Random rand = new System.Random();
-        curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
-    }
-
-    IEnumerator MoveClock()
-    {
-        while (isStart)
-        {
-            yield return new WaitForSecondsRealtime(1);
-            objSec.transform.Rotate(Vector3.back, secJump, Space.Self);
-            /*
-            idxSec += jumpGap;
-
-            if (idxSec > 59)
-            {
-                idxMin++;
-                idxSec = 0;
-                SetTimer('m', true);
-            }
-            else if (idxMin >= 60)
-            {
-                idxHour++;
-                idxSec = 0;
-                idxMin = 0;
-                SetTimer('h', true);
-            }
-            else if (idxHour == 13)
-            {
-                idxHour = 0;
-                idxMin = 0;
-                idxSec = 0;
-            }*/
-        }
-    }
-
-    IEnumerator MovingSmooth(GameObject target, float startDegree, float endDegree)
+    IEnumerator WiseSmooth(GameObject target, float startDegree, float endDegree)
     {
         float abc = Mathf.Lerp(startDegree, endDegree, 1f);
 
         yield return new WaitForSecondsRealtime(2f);
+    }
+
+    void InitNiddle(char idx)
+    {
+        switch (idx)
+        {
+            case 'h':
+                objHour.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+                break;
+            case 'm':
+                objMin.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                break;
+            case 's':
+                objSec.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                break;
+            default:
+                objHour.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                objMin.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                objSec.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                break;
+        }
     }
 }
