@@ -338,8 +338,8 @@ MonoBehaviour:
   objHour: {fileID: 6230420205804022433}
   objMin: {fileID: 2013164210}
   objSec: {fileID: 919504465}
-  txtTime: {fileID: 0}
-  btnRoot: {fileID: 1952949156}
+  txtTime: {fileID: 1659953534}
+  btnCtrTime: {fileID: 1952949156}
 --- !u!1 &619936787
 GameObject:
   m_ObjectHideFlags: 0
@@ -1015,7 +1015,7 @@ GameObject:
   - component: {fileID: 1495297137}
   - component: {fileID: 1495297136}
   m_Layer: 5
-  m_Name: Btn_Auito
+  m_Name: Btn_Random
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1148,7 +1148,7 @@ Transform:
   m_GameObject: {fileID: 1626262065}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 960, y: 540, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

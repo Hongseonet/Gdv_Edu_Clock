@@ -11,14 +11,16 @@ public class Main : MonoBehaviour
     GameObject objHour, objMin, objSec;
 
     [SerializeField]
-    TextMeshPro txtTime;
+    TextMeshProUGUI txtTime;
 
     [SerializeField]
-    Transform btnRoot;
+    Transform btnCtrTime;
 
     bool isStart;
-    int idxHour, idxMin, idxSec;
+    Vector3 curTime; //hour min sec
     int jumpGap, secJump;
+
+    bool isQuit;
     
     /*
         The hour hand moves 360 degrees / 12 in an hour = 30 degrees.
@@ -33,14 +35,27 @@ public class Main : MonoBehaviour
         secJump = 90; //1 or Dev
         jumpGap = 15; //1 or Dev
 
+        curTime = new Vector3(); //init time
+
         //btn search 2 depth, add listener
-        foreach(Transform depth1 in btnRoot){
+        foreach(Transform depth1 in btnCtrTime)
+        {
+            Button btn;
+
+            if (depth1.GetComponent<Button>() != null)
+            {
+                btn = depth1.GetComponent<Button>();
+                btn.onClick.AddListener(() => BtnEvent(btn));
+
+                Debug.Log("dd " + depth1.name);
+            }
+
             foreach(Transform depth2 in depth1)
             {
                 if(depth2.GetComponent<Button> () != null)
                 {
                     //Debug.Log("dd : " + depth1.name + " / " + depth2.name);
-                    Button btn = depth2.GetComponent<Button>();
+                    btn = depth2.GetComponent<Button>();
                     btn.onClick.AddListener(() => BtnEvent(btn));
                 }
             }
@@ -54,9 +69,22 @@ public class Main : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            //isStart = false;
-            //Application.Quit();
+            QuitApp();
         }
+    }
+
+    IEnumerator QuitApp()
+    {
+        if (isQuit)
+        {
+            isStart = false;
+            StopAllCoroutines();
+            Application.Quit();
+        }
+
+        isQuit = !isQuit;
+        yield return new WaitForSecondsRealtime(2f); //release after 2 sec
+        isQuit = !isQuit;
     }
 
     void BtnEvent(Button btn){
@@ -94,24 +122,58 @@ public class Main : MonoBehaviour
                 }
                 break;
         }
+
+        switch (btn.name.Split('_')[1].ToLower())
+        {
+            case "random":
+                SetRandom();
+                txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
+                break;
+            case "close":
+
+                break;
+        }
     }
 
     void SetTimer(char n, bool isForward)
     {
         Vector3 direct = isForward ? Vector3.back : Vector3.forward;
-            
+
         switch (n)
         {
             case 'h': //hour
+                curTime.x++;
                 objHour.transform.Rotate(direct, 30f, Space.Self);
                 break;
             case 'm': //minute
+                curTime.y++;
+                objHour.transform.Rotate(direct, 0.5f, Space.Self);
                 objMin.transform.Rotate(direct, 6f, Space.Self);
                 break;
             case 's': //second
+                curTime.z++;
                 objSec.transform.Rotate(direct, 6f, Space.Self);
                 break;
         }
+
+        if(curTime.z > 59)
+        {
+            curTime.y++;
+            curTime.z = 0;
+        }
+        else if(curTime.y > 59)
+        {
+            curTime.x++;
+            curTime.y = 0;
+        }
+
+        txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
+    }
+
+    void SetRandom()
+    {
+        System.Random rand = new System.Random();
+        curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
     }
 
     IEnumerator MoveClock()
@@ -120,6 +182,7 @@ public class Main : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(1);
             objSec.transform.Rotate(Vector3.back, secJump, Space.Self);
+            /*
             idxSec += jumpGap;
 
             if (idxSec > 59)
@@ -140,7 +203,7 @@ public class Main : MonoBehaviour
                 idxHour = 0;
                 idxMin = 0;
                 idxSec = 0;
-            }
+            }*/
         }
     }
 
@@ -149,13 +212,5 @@ public class Main : MonoBehaviour
         float abc = Mathf.Lerp(startDegree, endDegree, 1f);
 
         yield return new WaitForSecondsRealtime(2f);
-    }
-
-    void BtnEvnet(Button btn)
-    {
-        switch (btn.name.Split('_'))
-        {
-
-        }
     }
 }
