@@ -33,23 +33,19 @@ public class Main : MonoBehaviour
         //btn search 2 depth, add listener
         foreach(Transform depth1 in btnCtrTime)
         {
-            Button btn;
-
             if (depth1.GetComponent<Button>() != null)
             {
-                btn = depth1.GetComponent<Button>();
+                Button btn = depth1.GetComponent<Button>();
                 btn.onClick.AddListener(() => BtnEvent(btn));
-
-                Debug.Log("dd " + depth1.name);
             }
 
             foreach(Transform depth2 in depth1)
             {
                 if(depth2.GetComponent<Button> () != null)
                 {
-                    //Debug.Log("dd : " + depth1.name + " / " + depth2.name);
-                    btn = depth2.GetComponent<Button>();
-                    btn.onClick.AddListener(() => BtnEvent(btn));
+                    //Debug.Log("btn regist : " + depth1.name + " / " + depth2.name);
+                    Button btn2 = depth2.GetComponent<Button>();
+                    btn2.onClick.AddListener(() => BtnEvent(btn2));
                 }
             }
         }
@@ -90,11 +86,12 @@ public class Main : MonoBehaviour
     }
 
     void BtnEvent(Button btn){
+        //Debug.Log("dd " + btn.name);
 
-        switch (btn.transform.parent.name.Split('_')[1].ToLower())
+        switch (btn.transform.parent.name.Split('_')[1])
         {
-            case "hour":
-                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+            case "Hour":
+                if (btn.name.Split('_')[1].Equals("Increase"))
                 {
                     SetTimer('h', true);
                 }
@@ -103,8 +100,8 @@ public class Main : MonoBehaviour
                     SetTimer('h', false);
                 }
                 break;
-            case "min":
-                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+            case "Min":
+                if (btn.name.Split('_')[1].Equals("Increase"))
                 {
                     SetTimer('m', true);
                 }
@@ -113,8 +110,8 @@ public class Main : MonoBehaviour
                     SetTimer('m', false);
                 }
                 break;
-            case "sec":
-                if (btn.name.Split('_')[1].ToLower().Equals("inscrse"))
+            case "Sec":
+                if (btn.name.Split('_')[1].Equals("Increase"))
                 {
                     SetTimer('s', true);
                 }
@@ -125,9 +122,9 @@ public class Main : MonoBehaviour
                 break;
         }
 
-        switch (btn.name.Split('_')[1].ToLower())
+        switch (btn.name.Split('_')[1])
         {
-            case "random":
+            case "Random":
                 System.Random rand = new System.Random();
                 curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
                 txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
@@ -138,7 +135,7 @@ public class Main : MonoBehaviour
                 objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
                 objSec.transform.Rotate(Vector3.back, 6f * curTime.z, Space.Self);
                 break;
-            case "close":
+            case "Close":
                 StartCoroutine(QuitApp());
                 break;
         }
@@ -147,25 +144,35 @@ public class Main : MonoBehaviour
     void SetTimer(char n, bool isForward)
     {
         Vector3 direct = isForward ? Vector3.back : Vector3.forward;
-
+        int weight = 0;
+        if (isForward)
+        {
+            weight++;
+        }
+        else
+        {
+            weight--;
+        }
         switch (n)
         {
             case 'h': //hour
                 InitNiddle('h'); //temporary reset
-                curTime.x++;
+                if(isForward)
+                    curTime.x += weight;
                 objHour.transform.Rotate(direct, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
                 break;
             case 'm': //minute
-                curTime.y++;
+                curTime.y += weight;
                 objHour.transform.Rotate(direct, 0.5f, Space.Self);
                 objMin.transform.Rotate(direct, 6f, Space.Self);
                 break;
             case 's': //second
-                curTime.z++;
+                curTime.z += weight;
                 objSec.transform.Rotate(direct, 6f, Space.Self);
                 break;
         }
 
+        //positive
         if(curTime.z > 59)
         {
             curTime.y++;
@@ -179,6 +186,19 @@ public class Main : MonoBehaviour
         else if(curTime.x > 12)
         {
             curTime.x = 1;
+        }
+        //negative
+        else if(curTime.z < 0)
+        {
+            curTime.z = 59;
+        }
+        else if(curTime.y < 0)
+        {
+            curTime.y = 59;
+        }
+        else if(curTime.x < 0)
+        {
+            curTime.x = 11;
         }
 
         txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
