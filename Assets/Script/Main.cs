@@ -158,23 +158,23 @@ public class Main : MonoBehaviour
                 StartCoroutine(QuitApp());
                 break;
             case "TTS":
-                Debug.Log("cur time : " + curTime);
+                //Debug.Log("cur time : " + curTime);
                 string filePath = "";
+                string fileName = "";
 
                 if (Application.platform.Equals(RuntimePlatform.Android))
                 {
-                    //filePath = "jar:file://" + Application.dataPath + "!/assets";
-                    filePath = "file:///storage/emulated/0";
+                    //filePath = "jar:file://" + Application.dataPath + "!/assets/";
+                    filePath = "jar:file://" + Application.streamingAssetsPath;
                 }
                 else if (Application.platform.Equals(RuntimePlatform.WindowsEditor))
                 {
                     filePath = Application.streamingAssetsPath;
                 }
-            //else
-                //filePath = "file://" + Application.streamingAssetsPath;
+
+                
 
                 StartCoroutine(AudioPlay(Path.Combine(filePath + "/TTS/Hour/ddes.wav")));
-                //string filePath = Application.streamingAssetsPath + "/TTS/Hour/ddes";
                 
                 break;
         }
@@ -182,18 +182,21 @@ public class Main : MonoBehaviour
 
     IEnumerator AudioPlay(string filePath)
     {
-        Debug.Log("fi : " + filePath);
+        Debug.Log("filePath : " + filePath);
 
-        if (!File.Exists(filePath)){
-            Debug.LogWarning("no file");
-            yield break;
+        if (Application.platform.Equals(RuntimePlatform.WindowsEditor))
+        {
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning("no file exist");
+                yield break;
+            }
         }
 
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.UNKNOWN))
         //using (UnityWebRequest www = UnityWebRequest.Get(filePath))
         {
-            Debug.Log("psf : " + www.url);
-
+            //Debug.Log("psf : " + www.url);
             yield return www.SendWebRequest();
 
             while (!www.isDone) { }
