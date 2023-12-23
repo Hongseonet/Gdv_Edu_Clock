@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
-using System;
 
 public class Main : MonoBehaviour
 {
@@ -15,6 +17,11 @@ public class Main : MonoBehaviour
 
     [SerializeField]
     Transform btnCtrTime;
+
+    [SerializeField]
+    Button btnClose, btnTTS;
+
+    AudioSource audioSource;
 
     Vector3 curTime; //hour min sec
     bool isQuit;
@@ -30,8 +37,14 @@ public class Main : MonoBehaviour
     {
         curTime = new Vector3(); //init time
 
+        if (this.GetComponent<AudioSource>() == null)
+            this.gameObject.AddComponent<AudioSource>();
+
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
         //btn search 2 depth, add listener
-        foreach(Transform depth1 in btnCtrTime)
+        foreach (Transform depth1 in btnCtrTime)
         {
             if (depth1.GetComponent<Button>() != null)
             {
@@ -49,6 +62,9 @@ public class Main : MonoBehaviour
                 }
             }
         }
+
+        btnClose.onClick.AddListener(() => BtnEvent(btnClose));
+        btnTTS.onClick.AddListener(() => BtnEvent(btnTTS));
     }
 
     // Update is called once per frame
@@ -88,40 +104,43 @@ public class Main : MonoBehaviour
     void BtnEvent(Button btn){
         //Debug.Log("dd " + btn.name);
 
-        switch (btn.transform.parent.name.Split('_')[1])
+        if (btn.transform.parent.name.Split('_').Length > 1)
         {
-            case "Hour":
-                if (btn.name.Split('_')[1].Equals("Increase"))
-                {
-                    SetTimer('h', true);
-                }
-                else
-                {
-                    SetTimer('h', false);
-                }
-                break;
-            case "Min":
-                if (btn.name.Split('_')[1].Equals("Increase"))
-                {
-                    SetTimer('m', true);
-                }
-                else
-                {
-                    SetTimer('m', false);
-                }
-                break;
-            case "Sec":
-                if (btn.name.Split('_')[1].Equals("Increase"))
-                {
-                    SetTimer('s', true);
-                }
-                else
-                {
-                    SetTimer('s', false);
-                }
-                break;
+            switch (btn.transform.parent.name.Split('_')[1])
+            {
+                case "Hour":
+                    if (btn.name.Split('_')[1].Equals("Increase"))
+                    {
+                        SetTimer('h', true);
+                    }
+                    else
+                    {
+                        SetTimer('h', false);
+                    }
+                    break;
+                case "Min":
+                    if (btn.name.Split('_')[1].Equals("Increase"))
+                    {
+                        SetTimer('m', true);
+                    }
+                    else
+                    {
+                        SetTimer('m', false);
+                    }
+                    break;
+                case "Sec":
+                    if (btn.name.Split('_')[1].Equals("Increase"))
+                    {
+                        SetTimer('s', true);
+                    }
+                    else
+                    {
+                        SetTimer('s', false);
+                    }
+                    break;
+            }
         }
-
+        
         switch (btn.name.Split('_')[1])
         {
             case "Random":
@@ -138,6 +157,57 @@ public class Main : MonoBehaviour
             case "Close":
                 StartCoroutine(QuitApp());
                 break;
+            case "TTS":
+                Debug.Log("cur time : " + curTime);
+                string filePath = "";
+
+                if (Application.platform.Equals(RuntimePlatform.Android))
+                {
+                    //filePath = "jar:file://" + Application.dataPath + "!/assets";
+                    filePath = "file:///storage/emulated/0";
+                }
+                else if (Application.platform.Equals(RuntimePlatform.WindowsEditor))
+                {
+                    filePath = Application.streamingAssetsPath;
+                }
+            //else
+                //filePath = "file://" + Application.streamingAssetsPath;
+
+                StartCoroutine(AudioPlay(Path.Combine(filePath + "/TTS/Hour/ddes.wav")));
+                //string filePath = Application.streamingAssetsPath + "/TTS/Hour/ddes";
+                
+                break;
+        }
+    }
+
+    IEnumerator AudioPlay(string filePath)
+    {
+        Debug.Log("fi : " + filePath);
+
+        if (!File.Exists(filePath)){
+            Debug.LogWarning("no file");
+            yield break;
+        }
+
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.UNKNOWN))
+        //using (UnityWebRequest www = UnityWebRequest.Get(filePath))
+        {
+            Debug.Log("psf : " + www.url);
+
+            yield return www.SendWebRequest();
+
+            while (!www.isDone) { }
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+                audioSource.clip = myClip;
+                audioSource.Play();
+            }
         }
     }
 
