@@ -25,7 +25,8 @@ public class Main : MonoBehaviour
 
     Vector3 curTime; //hour min sec
     bool isQuit;
-    
+    Queue<AudioClip> queueAudio; //hour min min sec sec
+
     /*
         The hour hand moves 360 degrees / 12 in an hour = 30 degrees.
         It follows that in a minute it moves 30 degrees / 60 = 1/2 degree.
@@ -36,6 +37,7 @@ public class Main : MonoBehaviour
     void Start()
     {
         curTime = new Vector3(); //init time
+        queueAudio = new Queue<AudioClip>();
 
         if (this.GetComponent<AudioSource>() == null)
             this.gameObject.AddComponent<AudioSource>();
@@ -52,9 +54,9 @@ public class Main : MonoBehaviour
                 btn.onClick.AddListener(() => BtnEvent(btn));
             }
 
-            foreach(Transform depth2 in depth1)
+            foreach (Transform depth2 in depth1)
             {
-                if(depth2.GetComponent<Button> () != null)
+                if (depth2.GetComponent<Button>() != null)
                 {
                     //Debug.Log("btn regist : " + depth1.name + " / " + depth2.name);
                     Button btn2 = depth2.GetComponent<Button>();
@@ -70,7 +72,7 @@ public class Main : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             StartCoroutine(QuitApp());
         }
@@ -101,7 +103,7 @@ public class Main : MonoBehaviour
         isQuit = !isQuit;
     }
 
-    void BtnEvent(Button btn){
+    void BtnEvent(Button btn) {
         //Debug.Log("dd " + btn.name);
 
         if (btn.transform.parent.name.Split('_').Length > 1)
@@ -140,14 +142,14 @@ public class Main : MonoBehaviour
                     break;
             }
         }
-        
+
         switch (btn.name.Split('_')[1])
         {
             case "Random":
                 System.Random rand = new System.Random();
                 curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
                 txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
-                
+
                 InitNiddle('a'); //reset all
 
                 objHour.transform.Rotate(Vector3.back, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
@@ -160,7 +162,7 @@ public class Main : MonoBehaviour
             case "TTS":
                 //Debug.Log("cur time : " + curTime);
                 string filePath = "";
-                string fileName = "";
+                string ttsTime = "", ttsType = ""; //num 1 2 3 / type min sec
 
                 if (Application.platform.Equals(RuntimePlatform.Android))
                 {
@@ -172,15 +174,39 @@ public class Main : MonoBehaviour
                     filePath = Application.streamingAssetsPath;
                 }
 
-                
+                for (int i = 0; i < 3; i++) //tts speak hour min sec
+                {
+                    switch (i)
+                    {
+                        case 0: //hour
+                            ttsTime = "narr_hour_" + curTime.x.ToString();
+                            ttsType = "";
+                            if (curTime.x == 0 || curTime.x == 12)
+                                ttsTime = "narr_hour_12";
 
-                StartCoroutine(AudioPlay(Path.Combine(filePath + "/TTS/Hour/ddes.wav")));
-                
+                            //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".mp3")));
+                            GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".mp3"));
+                            break;
+                        default: //min sec
+                            string typeIdx = i == 1 ? "min" : "sec";
+                            ttsTime = i == 1 ? "narr_min_sec_" + curTime.y.ToString() : "narr_min_sec_" + curTime.z.ToString();
+                            ttsType = "narr_" + typeIdx;
+
+                            //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3")));
+                            GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3"));
+                            if (curTime.y != 0 || curTime.z != 0)
+                                //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3")));
+                                GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3"));
+                            break;
+                    }
+                }
+                StartCoroutine(PlayTTS());
                 break;
         }
     }
 
-    IEnumerator AudioPlay(string filePath)
+    //IEnumerator GetTTS(string filePath)
+    void GetTTS(string filePath)
     {
         Debug.Log("filePath : " + filePath);
 
@@ -189,7 +215,8 @@ public class Main : MonoBehaviour
             if (!File.Exists(filePath))
             {
                 Debug.LogWarning("no file exist");
-                yield break;
+                //yield break;
+                return;
             }
         }
 
@@ -197,21 +224,36 @@ public class Main : MonoBehaviour
         //using (UnityWebRequest www = UnityWebRequest.Get(filePath))
         {
             //Debug.Log("psf : " + www.url);
-            yield return www.SendWebRequest();
+            //yield return www.SendWebRequest();
+            www.SendWebRequest();
 
             while (!www.isDone) { }
 
             if (www.isNetworkError || www.isHttpError)
             {
-                Debug.Log(www.error);
+                Debug.LogError(www.error);
             }
             else
             {
-                AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
-                audioSource.clip = myClip;
-                audioSource.Play();
+                queueAudio.Enqueue(DownloadHandlerAudioClip.GetContent(www));
             }
         }
+    }
+
+    IEnumerator PlayTTS()
+    {
+        int loopCnt = queueAudio.Count; //for fix total count
+        //Debug.Log("cnt : " + queueAudio.Count);
+
+        for (int i = 0; i < loopCnt; i++)
+        {
+            audioSource.clip = queueAudio.Dequeue();
+            //Debug.Log("length " + i + " / " + audioSource.clip.length);
+            audioSource.Play ();
+            yield return new WaitForSecondsRealtime(audioSource.clip.length - 0.5f);
+            audioSource.Stop();
+        }
+        queueAudio.Clear();
     }
 
     void SetTimer(char n, bool isForward)
