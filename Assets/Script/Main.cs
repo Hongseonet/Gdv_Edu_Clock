@@ -148,7 +148,7 @@ public class Main : MonoBehaviour
             case "Random":
                 System.Random rand = new System.Random();
                 curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
-                txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
+                txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
 
                 InitNiddle('a'); //reset all
 
@@ -185,18 +185,18 @@ public class Main : MonoBehaviour
                                 ttsTime = "narr_hour_12";
 
                             //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".mp3")));
-                            GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".mp3"));
+                            GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".wav"));
                             break;
                         default: //min sec
                             string typeIdx = i == 1 ? "min" : "sec";
-                            ttsTime = i == 1 ? "narr_min_sec_" + curTime.y.ToString() : "narr_min_sec_" + curTime.z.ToString();
+                            ttsTime = i == 1 ? "narr_" + curTime.y.ToString() : "narr_" + curTime.z.ToString();
                             ttsType = "narr_" + typeIdx;
 
                             //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3")));
-                            GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3"));
-                            if (curTime.y != 0 || curTime.z != 0)
+                            GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".wav"));
+                            //if (curTime.y != 0 || curTime.z != 0)
                                 //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3")));
-                                GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3"));
+                                //GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".wav"));
                             break;
                     }
                 }
@@ -216,7 +216,7 @@ public class Main : MonoBehaviour
             {
                 Debug.LogWarning("no file exist");
                 //yield break;
-                return;
+                //return;
             }
         }
 
