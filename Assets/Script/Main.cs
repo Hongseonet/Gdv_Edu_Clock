@@ -194,9 +194,9 @@ public class Main : MonoBehaviour
 
                             //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3")));
                             GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".wav"));
-                            //if (curTime.y != 0 || curTime.z != 0)
+                            if (curTime.y != 0 || curTime.z != 0)
                                 //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3")));
-                                //GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".wav"));
+                                GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".wav"));
                             break;
                     }
                 }
@@ -250,7 +250,7 @@ public class Main : MonoBehaviour
             audioSource.clip = queueAudio.Dequeue();
             //Debug.Log("length " + i + " / " + audioSource.clip.length);
             audioSource.Play ();
-            yield return new WaitForSecondsRealtime(audioSource.clip.length - 0.5f);
+            yield return new WaitForSecondsRealtime(audioSource.clip.length);
             audioSource.Stop();
         }
         queueAudio.Clear();
@@ -316,7 +316,7 @@ public class Main : MonoBehaviour
             curTime.x = 11;
         }
 
-        txtTime.text = string.Format("{0:D2}", (int)curTime.x) + " : " + string.Format("{0:D2}", (int)curTime.y) + " : " + string.Format("{0:D2}", (int)curTime.z);
+        txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
     }
 
     IEnumerator WiseSmooth(GameObject target, float startDegree, float endDegree)
