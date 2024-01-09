@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -148,6 +150,18 @@ public class Main : MonoBehaviour
 
         switch (btn.name.Split('_')[1])
         {
+            case "CurTime":
+                //string strTime = DateTime.Now.ToString("HH:mm:ss"); //24
+                string[] strTime = DateTime.Now.ToString("hh:mm:ss").Split(':'); //12
+                curTime = new Vector3(float.Parse(strTime[0]), float.Parse(strTime[1]), float.Parse(strTime[2]));
+
+                InitNiddle('a'); //reset all
+
+                objHour.transform.Rotate(Vector3.back, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
+                objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
+                objSec.transform.Rotate(Vector3.back, 6f * curTime.z, Space.Self);
+
+                break;
             case "Random":
                 System.Random rand = new System.Random();
                 curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
