@@ -1,17 +1,17 @@
-# À¯¾Æ ½Ã°è ÇÐ½À ¾Û
+# ì•„ë‚ ë¡œê·¸ ì‹œê³„ í•™ìŠµ ì•±
 
 ## Summary
-¤¤ ¾Èµå·ÎÀÌµå ±â¹ÝÀÇ À¯¾Æ ½Ã°è ÇÐ½À ¾Û
-¤¤ ½Ã°è¸¦ µ¹¸®¸é ºù±Ûºù±Û µ¹¾Æ°¡¸ç, ÇöÀç ½Ã°£À» ¼ýÀÚ·Î ¾Ë·ÁÁÖ´Â ÇÐ½À
-¤¤ °³¹ß Áß...
+ã„´ ì•ˆë“œë¡œì´ë“œ ê¸°ë°˜ì˜ ì•„ë‚ ë¡œê·¸ ì‹œê³„ í•™ìŠµ ì•±
+ã„´ ì‹œ ë¶„ ì´ˆë¥¼ ë³´ë©´ì„œ ì‹œê³„ë¥¼ ì½ì„ ìˆ˜ ìžˆë„ë¡ ë„ì›€
+ã„´ TTS ê¸°ëŠ¥ìœ¼ë¡œ í˜„ìž¬ì‹œê°„ì„ ì½ì–´ ì¤Œ
 
 ## Developers
 
-¤¤ Unity 2023.1.9f
-¤¤ VIsual studio 2022
+ã„´ Unity 2023.1.9f
+ã„´ VIsual studio 2022
 
 ## Community
 
-<a href="https://github.com/bitholla/hollaex-kit/graphs/contributors">
-  <img src="https://contributors-img.web.app/image?repo=bitholla/hollaex-kit" />
+<a href="[https://github.com/bitholla/hollaex-kit/graphs/contributors](https://www.naver.com/)">
+  <img src="[https://contributors-img.web.app/image?repo=bitholla/hollaex-kit](https://order.pay.naver.com/home)https://order.pay.naver.com/home" />
 </a>
