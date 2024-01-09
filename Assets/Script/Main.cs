@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -19,12 +18,13 @@ public class Main : MonoBehaviour
     Transform btnCtrTime;
 
     [SerializeField]
-    Button btnClose, btnTTS;
+    Button btnClose, btnTTS, btnTheme;
+
+    bool isThemeDark, isQuit, isTTSPlay;
 
     AudioSource audioSource;
 
     Vector3 curTime; //hour min sec
-    bool isQuit;
     Queue<AudioClip> queueAudio; //hour min min sec sec
 
     /*
@@ -36,6 +36,8 @@ public class Main : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        isThemeDark = true; //default dark
+
         curTime = new Vector3(); //init time
         queueAudio = new Queue<AudioClip>();
 
@@ -67,6 +69,7 @@ public class Main : MonoBehaviour
 
         btnClose.onClick.AddListener(() => BtnEvent(btnClose));
         btnTTS.onClick.AddListener(() => BtnEvent(btnTTS));
+        btnTheme.onClick.AddListener(() => BtnEvent(btnTheme));
     }
 
     // Update is called once per frame
@@ -202,7 +205,22 @@ public class Main : MonoBehaviour
                 }
                 StartCoroutine(PlayTTS());
                 break;
+            case "Theme":
+                SetTheme();
+
+
+                break;
         }
+    }
+
+    void SetTheme()
+    {
+        isThemeDark = !isThemeDark; //theme toggle
+        string imgTheme;
+
+        imgTheme = isThemeDark ? "theme_black" : "theme_white";
+        btnTheme.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
+
     }
 
     //IEnumerator GetTTS(string filePath)
@@ -242,18 +260,25 @@ public class Main : MonoBehaviour
 
     IEnumerator PlayTTS()
     {
-        int loopCnt = queueAudio.Count; //for fix total count
-        //Debug.Log("cnt : " + queueAudio.Count);
-
-        for (int i = 0; i < loopCnt; i++)
+        if (!isTTSPlay)
         {
-            audioSource.clip = queueAudio.Dequeue();
-            //Debug.Log("length " + i + " / " + audioSource.clip.length);
-            audioSource.Play ();
-            yield return new WaitForSecondsRealtime(audioSource.clip.length);
-            audioSource.Stop();
+            isTTSPlay = true; //toggle
+
+            int loopCnt = queueAudio.Count; //for fix total count
+            //Debug.Log("cnt : " + queueAudio.Count);
+
+            for (int i = 0; i < loopCnt; i++)
+            {
+                audioSource.clip = queueAudio.Dequeue();
+                //Debug.Log("length " + i + " / " + audioSource.clip.length);
+                audioSource.Play();
+                yield return new WaitForSecondsRealtime(audioSource.clip.length);
+                audioSource.Stop();
+            }
+            queueAudio.Clear();
+
+            isTTSPlay = false;
         }
-        queueAudio.Clear();
     }
 
     void SetTimer(char n, bool isForward)
