@@ -22,7 +22,7 @@ public class Main : MonoBehaviour
     [SerializeField]
     Button btnClose, btnTTS, btnTheme;
 
-    bool isThemeDark, isQuit, isTTSPlay;
+    bool isThemeDark, isTTSPlay;
 
     AudioSource audioSource;
 
@@ -79,7 +79,7 @@ public class Main : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            StartCoroutine(QuitApp());
+            StartCoroutine(Common.Instance.QuitApp());
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
@@ -93,19 +93,6 @@ public class Main : MonoBehaviour
         {
             SetTimer('h', true);
         }
-    }
-
-    IEnumerator QuitApp()
-    {
-        if (isQuit)
-        {
-            StopAllCoroutines();
-            Application.Quit();
-        }
-
-        isQuit = !isQuit;
-        yield return new WaitForSecondsRealtime(2f); //release after 2 sec
-        isQuit = !isQuit;
     }
 
     void BtnEvent(Button btn) {
@@ -174,7 +161,7 @@ public class Main : MonoBehaviour
                 objSec.transform.Rotate(Vector3.back, 6f * curTime.z, Space.Self);
                 break;
             case "Close":
-                StartCoroutine(QuitApp());
+                StartCoroutine(Common.Instance.QuitApp());
                 break;
             case "TTS":
                 //Debug.Log("cur time : " + curTime);
@@ -235,6 +222,9 @@ public class Main : MonoBehaviour
         imgTheme = isThemeDark ? "theme_black" : "theme_white";
         btnTheme.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
 
+        objHour.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
+        objHour.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
+        objHour.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
     }
 
     //IEnumerator GetTTS(string filePath)
