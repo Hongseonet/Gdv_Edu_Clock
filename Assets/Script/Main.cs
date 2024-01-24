@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -11,6 +10,9 @@ using UnityEngine.UI;
 public class Main : MonoBehaviour
 {
     [SerializeField]
+    bool isDev;
+
+    [SerializeField]
     GameObject objHour, objMin, objSec;
 
     [SerializeField]
@@ -18,9 +20,6 @@ public class Main : MonoBehaviour
 
     [SerializeField]
     Transform btnCtrTime;
-
-    [SerializeField]
-    Button btnClose, btnTTS, btnTheme;
 
     bool isThemeDark, isTTSPlay;
 
@@ -49,6 +48,8 @@ public class Main : MonoBehaviour
         audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.playOnAwake = false;
 
+        InitNiddle('a');
+
         //btn search 2 depth, add listener
         foreach (Transform depth1 in btnCtrTime)
         {
@@ -68,10 +69,6 @@ public class Main : MonoBehaviour
                 }
             }
         }
-
-        btnClose.onClick.AddListener(() => BtnEvent(btnClose));
-        btnTTS.onClick.AddListener(() => BtnEvent(btnTTS));
-        btnTheme.onClick.AddListener(() => BtnEvent(btnTheme));
     }
 
     // Update is called once per frame
@@ -138,11 +135,12 @@ public class Main : MonoBehaviour
         switch (btn.name.Split('_')[1])
         {
             case "CurTime":
+                InitNiddle('a'); //reset all
+
                 //string strTime = DateTime.Now.ToString("HH:mm:ss"); //24
                 string[] strTime = DateTime.Now.ToString("hh:mm:ss").Split(':'); //12
                 curTime = new Vector3(float.Parse(strTime[0]), float.Parse(strTime[1]), float.Parse(strTime[2]));
-
-                InitNiddle('a'); //reset all
+                txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
 
                 objHour.transform.Rotate(Vector3.back, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
                 objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
@@ -150,11 +148,11 @@ public class Main : MonoBehaviour
 
                 break;
             case "Random":
+                InitNiddle('a'); //reset all
+
                 System.Random rand = new System.Random();
                 curTime = new Vector3(rand.Next(1, 12), rand.Next(0, 60), rand.Next(0, 60));
                 txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
-
-                InitNiddle('a'); //reset all
 
                 objHour.transform.Rotate(Vector3.back, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
                 objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
@@ -196,6 +194,7 @@ public class Main : MonoBehaviour
                             ttsTime = i == 1 ? "narr_" + curTime.y.ToString() : "narr_" + curTime.z.ToString();
                             ttsType = "narr_" + typeIdx;
 
+                            //exception 0 min 0 sec
                             //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3")));
                             GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".wav"));
                             if (curTime.y != 0 || curTime.z != 0)
@@ -209,7 +208,6 @@ public class Main : MonoBehaviour
             case "Theme":
                 SetTheme();
 
-
                 break;
         }
     }
@@ -220,7 +218,7 @@ public class Main : MonoBehaviour
         string imgTheme;
 
         imgTheme = isThemeDark ? "theme_black" : "theme_white";
-        btnTheme.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
+        //btnTheme.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
 
         objHour.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
         objHour.GetComponent<Image>().sprite = Resources.Load<Sprite>("Image/" + imgTheme);
@@ -230,7 +228,7 @@ public class Main : MonoBehaviour
     //IEnumerator GetTTS(string filePath)
     void GetTTS(string filePath)
     {
-        Debug.Log("filePath : " + filePath);
+        //Debug.Log("filePath : " + filePath);
 
         if (Application.platform.Equals(RuntimePlatform.WindowsEditor))
         {
@@ -374,5 +372,9 @@ public class Main : MonoBehaviour
                 objSec.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
                 break;
         }
+
+        curTime = Vector3.zero;
+
+        txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
     }
 }

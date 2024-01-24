@@ -38,4 +38,20 @@ public class Common : MonoSingleton<Common>
         yield return new WaitForSecondsRealtime(2f); //release after 2 sec
         isQuit = !isQuit;
     }
+
+    public void SetLog(char idx, string header, string msg)
+    {
+        switch (idx)
+        {
+            case 'w':
+                Debug.LogWarning(header + " / " + msg);
+                break;
+            case 'e':
+                Debug.LogError(header + " / " + msg);
+                break;
+            default:
+                Debug.Log(header + " / " + msg);
+                break;
+        }
+    }
 }
