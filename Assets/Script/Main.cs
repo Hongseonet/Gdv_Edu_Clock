@@ -190,6 +190,11 @@ public class Main : MonoBehaviour
                             GetTTS(Path.Combine(filePath + "/TTS/Hour/" + ttsTime + ".wav"));
                             break;
                         default: //min sec
+                            if (i == 1 && curTime.y == 0)
+                                continue;
+                            else if (i == 2 && curTime.z == 0)
+                                continue;
+
                             string typeIdx = i == 1 ? "min" : "sec";
                             ttsTime = i == 1 ? "narr_" + curTime.y.ToString() : "narr_" + curTime.z.ToString();
                             ttsType = "narr_" + typeIdx;
@@ -197,12 +202,13 @@ public class Main : MonoBehaviour
                             //exception 0 min 0 sec
                             //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".mp3")));
                             GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsTime + ".wav"));
-                            if (curTime.y != 0 || curTime.z != 0)
-                                //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3")));
-                                GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".wav"));
+                            //StartCoroutine(GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".mp3")));
+                            GetTTS(Path.Combine(filePath + "/TTS/Min_Sec/" + ttsType + ".wav"));
+                                
                             break;
                     }
                 }
+
                 StartCoroutine(PlayTTS());
                 break;
             case "Theme":
@@ -211,7 +217,6 @@ public class Main : MonoBehaviour
                 break;
         }
     }
-
     void SetTheme()
     {
         isThemeDark = !isThemeDark; //theme toggle
@@ -369,12 +374,11 @@ public class Main : MonoBehaviour
             default:
                 objHour.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
                 objMin.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
-                objSec.transform.localEulerAngles = new Vector3(0f, 0f, 90f); 
+                objSec.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+
+                curTime = Vector3.zero;
+                txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
                 break;
         }
-
-        curTime = Vector3.zero;
-
-        txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
     }
 }
