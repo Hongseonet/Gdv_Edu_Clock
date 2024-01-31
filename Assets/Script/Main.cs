@@ -22,6 +22,7 @@ public class Main : MonoBehaviour
     Transform btnCtrTime;
 
     bool isThemeDark, isTTSPlay;
+    bool isContinuanceTime; //
 
     AudioSource audioSource;
 
@@ -78,6 +79,9 @@ public class Main : MonoBehaviour
         {
             StartCoroutine(Common.Instance.QuitApp());
         }
+
+        //for test
+        /*
         else if (Input.GetKeyDown(KeyCode.S))
         {
             SetTimer('s', true);
@@ -90,10 +94,13 @@ public class Main : MonoBehaviour
         {
             SetTimer('h', true);
         }
+        */
     }
 
     void BtnEvent(Button btn) {
         //Debug.Log("dd " + btn.name);
+
+        isContinuanceTime = false;
 
         if (btn.transform.parent.name.Split('_').Length > 1)
         {
@@ -146,6 +153,8 @@ public class Main : MonoBehaviour
                 objMin.transform.Rotate(Vector3.back, 6f * curTime.y, Space.Self);
                 objSec.transform.Rotate(Vector3.back, 6f * curTime.z, Space.Self);
 
+                isContinuanceTime = true;
+                StartCoroutine(SetContinuanceTime());
                 break;
             case "Random":
                 InitNiddle('a'); //reset all
@@ -306,6 +315,11 @@ public class Main : MonoBehaviour
                 InitNiddle('h'); //temporary reset
                 if(isForward)
                     curTime.x += weight;
+                else
+                    curTime.x -= weight;
+
+                Debug.Log("dd " + curTime.x);
+
                 objHour.transform.Rotate(direct, (30f * curTime.x) + (0.5f * curTime.y), Space.Self);
                 break;
             case 'm': //minute
@@ -351,11 +365,18 @@ public class Main : MonoBehaviour
         txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
     }
 
-    IEnumerator WiseSmooth(GameObject target, float startDegree, float endDegree)
+    IEnumerator SetContinuanceTime()
     {
-        float abc = Mathf.Lerp(startDegree, endDegree, 1f);
+        if (!isContinuanceTime)
+            yield break;
 
-        yield return new WaitForSecondsRealtime(2f);
+        while (isContinuanceTime)
+        {
+            SetTimer('s', true);
+            txtTime.text = string.Format("{0:D2}", (int)curTime.x) + ":" + string.Format("{0:D2}", (int)curTime.y) + ":" + string.Format("{0:D2}", (int)curTime.z);
+
+            yield return new WaitForSecondsRealtime(1f);
+        }
     }
 
     void InitNiddle(char idx)
