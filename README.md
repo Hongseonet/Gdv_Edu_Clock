@@ -12,6 +12,5 @@
 
 ## Community
 
-<a href="https://www.naver.com/">
-  <img src="https://order.pay.naver.com/home)https://order.pay.naver.com/home" />
-</a>
+스크린샷
+  <img src="Build/Screenshot_1.png" />
